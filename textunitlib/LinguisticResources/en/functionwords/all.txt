@@ -1,0 +1,715 @@
+am
+are
+be able to
+been
+being
+can
+could
+dare
+did
+do
+does
+had
+had better
+has
+have
+have to
+having
+is
+may
+might
+must
+need
+need to
+ought
+ought to
+shall
+should
+to
+used to
+was
+were
+will
+would
+accordingly
+addition
+after
+after which
+albeit
+also
+alternatives
+although
+and
+and so
+apart from
+as
+as a result of
+as if
+as long as
+as much as
+as soon as
+as though
+as well as
+assuming that
+at which
+at which point
+because
+because of
+before
+besides
+besides which
+both
+but
+by the time
+concession
+conditional
+consequently
+considering
+contrast\n
+conversely
+despite
+due to
+either
+else
+even if
+even though
+except
+except that
+for
+for example
+for instance
+furthermore
+given that
+giving examples
+hence
+how
+however
+if
+in a way
+in addition to
+in case
+in case that
+in order
+in order that
+in order to
+in particular
+in spite of
+in the way
+in view of the fact
+instead
+just as
+just in case
+lest
+like
+likewise
+manner
+meanwhile
+moreover
+much as
+neither
+nevertheless
+nonetheless
+nor
+not that
+now
+now that
+on account of
+once
+one condition that
+only if
+or
+or else
+otherwise
+provided
+provided that
+providing
+providing that
+purpose
+rather
+rather than
+reason
+result
+seeing as
+seeing as that
+since
+so
+so as to
+so long as
+so that
+still
+than
+that
+the moment
+the way
+then
+thence
+therefore
+tho'
+though
+thus
+till
+to
+unless
+until
+what
+whatever
+when
+whenever
+where
+whereas
+whereupon
+wherever
+whether
+which
+whichever
+while
+whilst
+who
+whoever
+whom
+whomever
+whose
+why
+yet
+1/2
+1/3
+1/4
+a
+a few
+a little
+a whole nother
+a whole 'nother
+all
+almost all
+an
+and the other
+anny
+anoda
+anotha
+anotha'
+another
+any
+any and all
+any ol'
+any old
+any ole
+any-and-all
+atta
+beaucoup
+bofe
+bolth
+both
+bothe
+certain
+couple
+dat
+dem
+dese
+dis
+each
+each and every
+ebery
+either
+em
+enny
+enough
+enuf
+enuff
+eny
+e'ry
+euerie
+euery
+ever
+everie
+everwhat
+every
+few
+fewer
+fewest
+fewscore
+fiew
+fuck all
+half
+he
+hecka
+hella
+her
+hes
+hevery
+his
+hits
+how many
+how much
+hundredsome
+hys
+its
+it's
+last
+least
+less
+less and less
+little
+ma
+mah
+many
+many a
+many another
+manye
+me
+mickle
+more
+more and more
+mos'
+most
+much
+muchee
+muh
+my
+nary a
+neither
+next
+nil
+no
+none
+not a little
+not even one
+'nough
+one or two
+or the other
+other
+our
+overmuch
+owne
+plenty
+quite a few
+quodque
+'s
+said
+several
+severall
+she
+some
+some kind of
+some kinda
+some ol'
+some old
+some ole
+such
+sufficient
+that
+that there
+the
+their
+them
+there
+these
+they
+they're
+they's
+thilk
+thine
+this
+this here
+those
+thousandsome
+thy
+too many
+umpteen
+us
+various
+vich
+wat
+we
+what
+whate'er
+whatevah
+whatever
+whatevuh
+which
+whichever
+whose
+yer
+yo
+yo'
+yonder
+you
+your
+yure
+zis
+a
+ablow
+aboard
+about
+above
+abreast
+abroad
+absent
+according to
+across
+adjacent
+adjacent to
+afore
+after
+against
+ahead
+ahead of
+ahind
+all over
+allow
+along
+alongside
+amid
+amidst
+among
+amongst
+an
+anear
+anti
+apart from
+apropos
+apud
+around
+as
+as far as
+as for
+as of
+as opposed to
+as per
+as regards
+as soon as
+as to
+as well as
+aside
+aside from
+astern of
+astraddle
+astride
+at
+at the behest of
+atop
+atween
+away from
+ayond
+b4
+back to
+bar
+barring
+because of
+before
+behind
+below
+beneath
+beside
+besides
+between
+beyond
+bove
+but
+by
+by means of
+by the time of
+by virtue of
+ca.
+circa
+close by
+close to
+come
+concerning
+considering
+cross
+dehors
+despite
+down
+due to
+during
+except
+except for
+excepting
+excluding
+failing
+far from
+following
+for
+for all
+for the sake of
+from
+given
+in
+in accordance with
+in addition to
+in between
+in case of
+in front of
+in keeping with
+in lieu of
+in order to
+in place of
+in point of
+in spite of
+in view of
+including
+inside
+inside of
+instead of
+into
+left of
+less
+like
+minus
+near
+near to
+nearer
+next to
+notwithstanding
+of
+off
+on
+on account of
+on behalf of
+on top of
+onto
+ontop
+opposite
+opposite of
+opposite to
+other than
+out
+out from
+out of
+outen
+outside
+outside of
+over
+owing to
+pace
+past
+pending
+per
+pertaining to
+plus
+post
+pre
+prior to
+pro
+pursuant to
+rather than
+regarding
+regardless of
+respecting
+right of
+round
+save
+saving
+short
+similar to
+since
+sithence
+spite
+subsequent to
+such as
+than
+thanks to
+through
+throughout
+thru
+thruout
+till
+to
+tofore
+toward
+towards
+under
+underneath
+unlike
+until
+unto
+up
+up to
+upon
+upside
+versus
+via
+vice
+wanting
+with
+with a view to
+with regard to
+with respect to
+within
+without
+worth
+all
+another
+any
+anybody
+anyone
+anything
+both
+each
+each other
+either
+enough
+everybody
+everyone
+everything
+few
+he
+her
+hers
+herself
+him
+himself
+his
+i
+it
+its
+itself
+little
+many
+me
+mine
+more
+most
+much
+myself
+neither
+no one
+nobody
+none
+nothing
+one
+one another
+other
+others
+ours
+ourselves
+several
+she
+some
+somebody
+someone
+something
+such
+that
+theirs
+them
+themselves
+these
+they
+this
+those
+us
+we
+what
+whatever
+which
+whichever
+who
+whoever
+whom
+whomever
+whose
+you
+yours
+yourself
+yourselves
+0%
+1%
+1/2
+1/4
+10%
+100%
+25%
+5%
+50%
+75%
+99%
+a bit of
+a couple of
+a few
+a good deal of
+a good many
+a great deal of
+a great many
+a great number of
+a lack of
+a large amount of
+a large number of
+a large quantity of
+a little
+a little bit of
+a load of
+a lot of
+a majority of
+a minority of
+a number of
+a plethora of
+a quantity of
+a small number of
+all
+an amount of
+another
+any
+both
+certain
+dozen
+each
+eight
+either
+eleven
+enough
+few
+fewer
+four
+half-dozen
+heaps of
+hundreds of
+in dozens
+least
+less
+little
+loads
+loads of
+lots
+lots of
+many
+masses of
+more
+most
+much
+neither
+nine
+no
+none
+not any
+not many
+not much
+numbers of
+one
+one fifth
+one fourth
+one half
+one quarter
+one third
+part
+plenty of
+quantities of
+seven
+several
+six
+some
+ten
+the lack of
+the majority of
+the minority of
+the number of
+the plethora of
+the remainder of
+the rest of
+the whole
+thousands of
+three
+tons of
+twelve
+two
+various
