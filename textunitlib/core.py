@@ -9,8 +9,10 @@ from collections import Counter
 import regex
 import spacy
 import emoji
+import datefinder
+from urlextract import URLExtract
+from email_scraper import scrape_emails
 
-#from nlp_handler import NlpHandler, SpacyModelSize 
 from . import lib_functions
 from .nlp_handler import NlpHandler, SpacyModelSize
 
@@ -607,3 +609,62 @@ class TextUnit:
     def tris_legomenon_units(self, text_units: List[str]) -> List[str]:
         """Return text units that appear exactly three times (tris legomena)."""
         return self.legomenon_units(text_units, n=3)
+
+
+    def dates(self, text: str, output_format: str = "%d.%m.%Y") -> List[str]:
+        """
+        Extracts dates from the given text and returns a list of formatted dates.
+
+        Parameters:
+        - text (str): The input text containing dates.
+        - output_format (str, optional): The desired output format for the dates. Default is "%d.%m.%Y".
+
+        Returns:
+        List[str]: A list of strings representing the extracted and formatted dates.
+
+        Example:
+        >>> text = "The event is scheduled for 01-15-2022 and 02/20/2022."
+        >>> dates(text)
+        ['15.01.2022', '20.02.2022']
+        """
+        matches = datefinder.find_dates(text)
+        return [d.strftime(output_format) for d in matches]
+
+    def urls(self, text: str) -> List[str]:
+        """
+        Extracts URLs from the given text.
+
+        Parameters:
+        - text (str): The input text from which URLs need to be extracted.
+
+        Returns:
+        - List[str]: A list of URLs extracted from the input text.
+
+        Example:
+        >>> text = "Visit https://www.example.com or www.beispiel.de for more information."
+        >>> urls(text)
+        ['https://www.example.com']
+        """
+        extractor = URLExtract()
+        return list(extractor.gen_urls(text))
+
+    def email_addresses(self, text: str) -> List[str]:
+        """
+        Extracts email addresses from the given text.
+
+        Parameters:
+        - text (str): The input text from which email addresses will be extracted.
+
+        Returns:
+        List[str]: A list of unique email addresses found in the text.
+
+        Note:
+        The function currently returns a set to ensure unique email addresses. To allow duplicates,
+        modify the implementation accordingly.
+
+        Example:
+        >>> emails = email_addresses("Contact us at john.doe@example.com or support@example.com")
+        ['john.doe@example.com', 'support@example.com']
+        """
+        # TODO: Allow duplicates !! Currently a set is returned
+        return scrape_emails(text)
