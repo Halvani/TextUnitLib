@@ -124,11 +124,12 @@ class TextUnit:
                 self._log("[TextUnit] Using spaCy pipeline from provided NlpHandler.")
             else:
                 # Construct a new NlpHandler with matching language
-                # Import here to avoid circular import at module load time
-                from nlp_handler import NlpHandler as _NlpHandler, SpacyModelSize as _SpacyModelSize
+                # Import here to avoid circular import at module load time             
+                from .nlp_handler import NlpHandler as _NlpHandler, SpacyModelSize as _SpacyModelSize
 
                 lang_hint = self._to_nlp_handler_language(self.__language)
-                handler_kwargs = {"language": lang_hint}
+                handler_kwargs = {"language": lang_hint}                
+                
                 if model_id is not None:
                     handler_kwargs["model_id"] = model_id
                 self.__nlp_handler = _NlpHandler(**handler_kwargs)
