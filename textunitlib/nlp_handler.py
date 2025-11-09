@@ -116,7 +116,7 @@ class NlpHandler:
       • Batch processing (nlp.pipe)
 
     Multilingual note:
-      - Pass `language=Language.English` or `Language.German` (your enum)
+      - Pass `language=Language.English` or `Language.German` 
         or a string like "English"/"German"/"en"/"de".
       - Optionally specify `model_id=SpacyModelSize.English_Large`, etc.
     """
@@ -125,16 +125,24 @@ class NlpHandler:
         self,
         model_id: Optional[Union[str, SpacyModelSize]] = None,
         *,
-        language: Optional[Any] = "english",   # ✅ Explicit default
-        use_components: Optional[Iterable[str]] = ("tagger", "senter", "lemmatizer", "morphologizer", "attribute_ruler"),
+        language: Optional[Any] = "english",
+        use_components: Optional[Iterable[str]] = (
+            "tagger",
+            "senter",
+            "lemmatizer",
+            "morphologizer",
+            "attribute_ruler",
+        ),
+        ensure_sentencizer: bool = True,
         verbose: bool = False,
         log_fn: Optional[Callable[[str], None]] = None,
         nlp: Optional["spacy.language.Language"] = None,
-        project_name: str = "[NLP]"
+        project_name: str = "[NLP]",
     ):
         self.language = _norm_language(language)
         self.model_id = _resolve_model_id(self.language, model_id)
         self.use_components = tuple(use_components) if use_components is not None else None
+        self.ensure_sentencizer = bool(ensure_sentencizer)
         self.verbose = bool(verbose)
         self._log_fn = log_fn
         self._nlp_override = nlp
@@ -148,19 +156,46 @@ class NlpHandler:
                 self._log_fn(msg)
                 return
             except Exception:
+                # fall back to stdout if custom logger fails
                 pass
         if self.verbose:
             print(msg, flush=True)
+
+    # ------------------------- sentence boundary helper -----------------
+
+    def _ensure_sentence_boundaries(self, nlp_obj: "spacy.language.Language") -> None:
+        """
+        Ensure that there is at least one component that sets sentence boundaries.
+
+        If `ensure_sentencizer` is True and no 'parser', 'senter' or
+        'sentencizer' is present, a simple rule-based 'sentencizer' component
+        is added.
+        """
+        if not self.ensure_sentencizer:
+            return
+
+        if any(name in nlp_obj.pipe_names for name in ("parser", "senter", "sentencizer")):
+            return
+
+        nlp_obj.add_pipe("sentencizer")
+        self._log(f"{self.project_name} Added 'sentencizer' to spaCy pipeline for sentence segmentation.")
 
     # ------------------------- spaCy loading ----------------------------
 
     @cache
     def get_nlp(self) -> "spacy.language.Language":
+        # If the user provided a pipeline, respect it (and optionally ensure sentencizer)
         if self._nlp_override is not None:
-            return self._nlp_override
+            nlp_obj = self._nlp_override
+            self._log(f"{self.project_name} Using provided spaCy pipeline override.")
+            self._ensure_sentence_boundaries(nlp_obj)
+            return nlp_obj
 
         requested = ", ".join(self.use_components) if self.use_components else "all"
-        self._log(f"{self.project_name} Loading spaCy model '{self.model_id}' for {self.language} (using: {requested})...")
+        self._log(
+            f"{self.project_name} Loading spaCy model '{self.model_id}' "
+            f"for {self.language} (using: {requested})..."
+        )
 
         def _prune_components(nlp_obj: "spacy.language.Language") -> "spacy.language.Language":
             if self.use_components is None:
@@ -176,12 +211,16 @@ class NlpHandler:
             return nlp_obj
 
         try:
-            nlp = spacy.load(self.model_id)
-            nlp = _prune_components(nlp)
+            nlp_obj = spacy.load(self.model_id)
+            nlp_obj = _prune_components(nlp_obj)
+            self._ensure_sentence_boundaries(nlp_obj)
             self._log(f"{self.project_name} Loaded '{self.model_id}'.")
-            return nlp
+            return nlp_obj
         except OSError:
-            self._log(f"{self.project_name} Model '{self.model_id}' not found. Attempting to download...")
+            self._log(
+                f"{self.project_name} Model '{self.model_id}' not found. "
+                f"Attempting to download..."
+            )
             try:
                 from spacy.cli import download as spacy_download
                 self._log(f"{self.project_name} Downloading '{self.model_id}'.")
@@ -191,12 +230,18 @@ class NlpHandler:
                 raise RuntimeError(f"Failed to install spaCy model '{self.model_id}': {e}")
 
             try:
-                nlp = spacy.load(self.model_id)
-                nlp = _prune_components(nlp)
-                self._log(f"{self.project_name} Successfully installed and loaded '{self.model_id}'.")
-                return nlp
+                nlp_obj = spacy.load(self.model_id)
+                nlp_obj = _prune_components(nlp_obj)
+                self._ensure_sentence_boundaries(nlp_obj)
+                self._log(
+                    f"{self.project_name} Successfully installed and loaded "
+                    f"'{self.model_id}'."
+                )
+                return nlp_obj
             except Exception as e:
-                raise RuntimeError(f"Installed spaCy model '{self.model_id}', but failed loading it: {e}")
+                raise RuntimeError(
+                    f"Installed spaCy model '{self.model_id}', but failed loading it: {e}"
+                )
 
     # ------------------------- Core utilities ---------------------------
 
@@ -204,8 +249,15 @@ class NlpHandler:
         return list(self.get_nlp()(text))
 
     def sents(self, text: str) -> List[str]:
+        """
+        Return sentences from text. Thanks to `ensure_sentencizer` (default True),
+        the pipeline will normally have proper sentence boundaries.
+        """
         doc = self.get_nlp()(text)
-        return [s.text for s in doc.sents] if doc.has_annotation("SENT_START") else [doc.text]
+        # With ensure_sentencizer, doc.sents should be set, but keep a safe fallback:
+        if doc.has_annotation("SENT_START"):
+            return [s.text for s in doc.sents]
+        return [doc.text]
 
     def pos_tags(self, text: str) -> List[Tuple[str, str]]:
         doc = self.get_nlp()(text)
@@ -232,5 +284,16 @@ class NlpHandler:
             for t in doc
         ]
 
-    def pipe(self, texts: Iterable[str], batch_size: int = 1000, n_process: int = 1, as_tuples: bool = False):
-        return self.get_nlp().pipe(texts, batch_size=batch_size, n_process=n_process, as_tuples=as_tuples)
+    def pipe(
+        self,
+        texts: Iterable[str],
+        batch_size: int = 1000,
+        n_process: int = 1,
+        as_tuples: bool = False,
+    ):
+        return self.get_nlp().pipe(
+            texts,
+            batch_size=batch_size,
+            n_process=n_process,
+            as_tuples=as_tuples,
+        )

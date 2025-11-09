@@ -576,8 +576,60 @@ class TextUnit:
         emojis = [grapheme for grapheme in graphemes if emoji.is_emoji(grapheme)]
         return [emoji.demojize(c, language=lang_code) for c in emojis] if demojize else emojis
         
-        
-   
+
+
+    def tokens(
+        self,
+        text: str,
+        strategy: Tokenization = Tokenization.Whitespace,
+        sep: Optional[str] = None,
+    ) -> List[Union[str, Token]]:
+        """
+        Tokenize text using the specified strategy.
+
+        Args:
+            text (str): The input text to tokenize.
+            strategy (Tokenization, optional): Tokenization strategy.
+                - Whitespace: split on whitespace or a custom separator
+                - WhitespacePunctuation: split on words and punctuation
+                - SpacyTokens: return spaCy Token objects
+                - SpacyStringTokens: return token texts from spaCy
+            sep (str, optional): Custom separator used only with the Whitespace strategy.
+                If None, split on arbitrary whitespace.
+
+        Returns:
+            List[Union[str, Token]]: A list of tokens according to the chosen strategy.
+
+        Raises:
+            RuntimeError: If a spaCy based strategy is used but the pipeline is not initialized.
+            ValueError: If an unknown tokenization strategy is provided.
+        """
+        if strategy is self.Tokenization.Whitespace:
+            # Default split uses arbitrary whitespace when sep is None
+            return text.split() if sep is None else text.split(sep)
+
+        if strategy is self.Tokenization.WhitespacePunctuation:
+            return wordpunct_tokenize(text)
+
+        # spaCy based strategies require an initialized pipeline
+        if self.__nlp is None and strategy in {
+            self.Tokenization.SpacyTokens,
+            self.Tokenization.SpacyStringTokens,
+        }:
+            raise RuntimeError(
+                "spaCy pipeline is not initialized but a spaCy tokenization strategy was requested."
+            )
+
+        if strategy is self.Tokenization.SpacyTokens:
+            return list(self.__nlp(text))
+
+        if strategy is self.Tokenization.SpacyStringTokens:
+            return [t.text for t in self.__nlp(text)]
+
+        raise ValueError(f"Unsupported tokenization strategy: {strategy}")
+
+
+
 
     def legomenon_units(self, text_units: List[str], n: int) -> List[str]:
         """
@@ -668,3 +720,35 @@ class TextUnit:
         """
         # TODO: Allow duplicates !! Currently a set is returned
         return scrape_emails(text)
+
+
+    def sentences(self, text: str, remove_empty_lines: bool = True) -> List[str]:
+        """
+        Segment the input text into sentences using the spaCy pipeline.
+
+        Args:
+            text (str): The input text to segment.
+            remove_empty_lines (bool, optional): If True, exclude sentences that are empty
+                or contain only whitespace. Defaults to True.
+
+        Returns:
+            List[str]: A list of sentence strings extracted from the text.
+
+        Raises:
+            RuntimeError: If the spaCy pipeline is not initialized.
+
+        Example:
+            >>> tu = TextUnit()
+            >>> tu.sentences("Hello world. This is TextUnit.")
+            ['Hello world.', 'This is TextUnit.']
+        """
+        if self.__nlp is None:
+            raise RuntimeError("spaCy pipeline is not initialized.")
+
+        doc = self.__nlp(text)
+
+        sentences = [s.text.strip() for s in doc.sents]
+        if remove_empty_lines:
+            sentences = [s for s in sentences if s]
+
+        return sentences
