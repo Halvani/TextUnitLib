@@ -126,13 +126,7 @@ class NlpHandler:
         model_id: Optional[Union[str, SpacyModelSize]] = None,
         *,
         language: Optional[Any] = "english",
-        use_components: Optional[Iterable[str]] = (
-            "tagger",
-            "senter",
-            "lemmatizer",
-            "morphologizer",
-            "attribute_ruler",
-        ),
+        use_components: Optional[Iterable[str]] = None,   # <-- changed: do not prune by default
         ensure_sentencizer: bool = True,
         verbose: bool = False,
         log_fn: Optional[Callable[[str], None]] = None,

@@ -1,8 +1,5 @@
-# textunitlib/lif_functions.py
-
-from enum import Enum
-from typing import Union, List
-
+from typing import Callable, Iterable, List, Optional, Union
+from enum import Enum, auto
 
 class ResultingGrams(Enum):
     TOKENS = "tokens"
@@ -70,3 +67,6 @@ def textunit_ngrams(
         ngrams = [ng.strip() for ng in ngrams]
 
     return ngrams
+    
+    
+    
