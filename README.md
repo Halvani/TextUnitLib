@@ -178,3 +178,9 @@ TUL’s feature extraction capabilities enable a wide range of use cases, includ
 - Emojis: As visual pictograms or as shortcodes
 - Hapax/dis/tris legomenon text units 
 - Quotations
+
+## License
+The TextUnitLib package is released under the Apache-2.0 license. See <a href="https://github.com/Halvani/textunitlib/blob/main/LICENSE">LICENSE</a> for further details.
+
+## Last Remarks
+As is usual with open source projects, we developers do not earn any money with what we do, but are primarily interested in giving something back to the community with fun, passion and joy. Nevertheless, we would be very happy if you rewarded all the time that has gone into the project with just a small star 🤗
