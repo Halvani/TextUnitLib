@@ -953,36 +953,63 @@ class TextUnit:
         return sentences
 
     def postags(self,
-                text: str,
-                postag_type: PostagType = PostagType.Universal,
-                combine_with_token: bool = False,
-                combine_sep: Optional[str] = None,
-                tags_to_consider: Optional[List[str]] = None) -> List[Union[str, tuple]]:
+            text: str,
+            postag_type: PostagType = PostagType.Universal,
+            combine_with_token: bool = False,
+            combine_sep: Optional[str] = None,
+            tags_to_consider: Optional[List[str]] = None,
+            tokens_only: bool = False) -> List[Union[str, tuple]]:
         """
-        Extract part-of-speech (POS) tags from the input text using the spaCy pipeline.
+        Extract part-of-speech (POS) information from the input text using the spaCy pipeline.
 
         Args:
             text (str): The input text to analyze.
+
             postag_type (PostagType, optional): The POS tag scheme to use.
-                - Universal: Universal POS tags (default, coarse-grained)
+                - Universal: Universal POS tags (coarse-grained, default)
                 - Finegrained: Language-specific fine-grained POS tags
                 Defaults to PostagType.Universal.
-            combine_with_token (bool, optional): If True, combine each token with its POS tag.
-                If False, return only POS tags. Defaults to False.
-            combine_sep (str, optional): Separator used when combining tokens and tags.
+
+            combine_with_token (bool, optional): 
+                If True, combine each token with its POS tag.
+                Ignored if tokens_only=True.
+                Defaults to False.
+
+            combine_sep (str, optional): 
+                Separator used when combining tokens and tags.
                 Only used if combine_with_token=True.
                 - If None: returns (token, tag) tuples
                 - If provided: returns "token<sep>tag" strings
-                Defaults to None.
-            tags_to_consider (List[str], optional): If provided, only extract tokens/tags
-                that match one of the specified POS tags. If None, include all tags.
+                Ignored if tokens_only=True.
                 Defaults to None.
 
+            tags_to_consider (List[str], optional): 
+                If provided, only extract tokens/tags whose POS tag matches one of 
+                the specified tags. If None, include all tags.
+                Defaults to None.
+
+            tokens_only (bool, optional):
+                If True, return only the tokens corresponding to the POS tags 
+                (filtered by tags_to_consider if provided), without returning 
+                the POS tags themselves. Overrides combine_with_token and 
+                combine_sep.
+                Defaults to False.
+
         Returns:
-            List[Union[str, tuple]]: POS tags or combinations depending on parameters:
-                - combine_with_token=False: List of POS tag strings
-                - combine_with_token=True, combine_sep=None: List of (token, tag) tuples
-                - combine_with_token=True, combine_sep=str: List of "token<sep>tag" strings
+            List[Union[str, tuple]]:
+                Depending on parameters, one of the following:
+
+                - tokens_only=True:
+                    List of token strings
+
+                - tokens_only=False and combine_with_token=False:
+                    List of POS tag strings
+
+                - tokens_only=False and combine_with_token=True, combine_sep=None:
+                    List of (token, tag) tuples
+
+                - tokens_only=False and combine_with_token=True, combine_sep=str:
+                    List of "token<sep>tag" strings
 
         Raises:
             RuntimeError: If the spaCy pipeline is not initialized.
@@ -993,6 +1020,9 @@ class TextUnit:
             >>> tu.postags("Hello world!")
             ['INTJ', 'NOUN', 'PUNCT']
 
+            >>> tu.postags("Hello world!", tokens_only=True)
+            ['Hello', 'world', '!']
+
             >>> tu.postags("Hello world!", combine_with_token=True, combine_sep="_")
             ['Hello_INTJ', 'world_NOUN', '!_PUNCT']
 
@@ -1001,7 +1031,11 @@ class TextUnit:
 
             >>> tu.postags("Hello world!", tags_to_consider=['NOUN', 'VERB'])
             ['NOUN']
+
+            >>> tu.postags("Hello world!", tags_to_consider=['NOUN'], tokens_only=True)
+            ['world']
         """
+
         if self.__nlp is None:
             raise RuntimeError("spaCy pipeline is not initialized.")
 
@@ -1015,21 +1049,22 @@ class TextUnit:
             token = t.text
             postag = t.pos_ if postag_type == self.PostagType.Universal else t.tag_
 
-            # Skip if filtering by specific tags
+            # Filtering by POS tag
             if tags_to_consider is not None and postag not in tags_to_consider:
                 continue
 
-            # Build result based on combine_with_token flag
+            # NEW: tokens_only mode
+            if tokens_only:
+                result.append(token)
+                continue
+
+            # Original logic
             if combine_with_token:
-                # Combine token and tag
                 if self.__none_or_empty(combine_sep):
-                    # Return as tuple if no separator provided
                     result.append((token, postag))
                 else:
-                    # Return as combined string with separator
                     result.append(f"{token}{combine_sep}{postag}")
             else:
-                # Return only the POS tag
                 result.append(postag)
         return result
 
@@ -1062,6 +1097,7 @@ class TextUnit:
         Raises:
             ValueError: If n < 1 or postag_type is invalid.
         """
+        
         if n < 1:
             raise ValueError("n must be >= 1.")
         if postag_type not in {self.PostagType.Universal, self.PostagType.Finegrained}:
@@ -1123,6 +1159,7 @@ class TextUnit:
             >>> tu.token_ngrams("The kickoff meeting", n=2, sep="_")
             ['The_kickoff', 'kickoff_meeting']
         """
+        
         if n < 1:
             raise ValueError("n must be >= 1.")
 
@@ -1178,6 +1215,7 @@ class TextUnit:
             >>> tu.textunit_lengths(["aa","b","cc","d"], sort_by_length=True)
             {1: ['b','d'], 2: ['aa','cc']}
         """
+        
         if not isinstance(text_units, (list, tuple)):
             raise TypeError("text_units must be a list or tuple of strings.")
         for u in text_units:
