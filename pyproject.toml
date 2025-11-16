@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "posnoise"
+version = "0.0.1"
+authors = [{name="Oren Halvani"}]
+description = "TextUnitLib: A Python library for extracting diverse text units from textual data"
+readme = "README.md"
+requires-python = ">=3.9"
+
+classifiers = [
+	"Development Status :: 4 - Beta",
+	"Intended Audience :: Developers",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent", 
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12"
+]
+
+dependencies = [
+    # Text processing
+    "regex==2024.5.15",
+    "nltk==3.8.1",
+    "spacy==3.7.4",
+
+    # Entity / pattern extraction
+    "email_scraper==0.5",
+    "urlextract==1.9.0",
+
+    # Date and emoji handling
+    "datefinder==0.7.3",
+    "emoji==2.11.0"
+]
+
+keywords = ["text-features", "feature-extraction", "stylometry", "text-units", "feature-engineering"]
+
+[project.urls]
+"Homepage" = "https://github.com/Halvani/TextUnitLib"
+"Bug Tracker" = "https://github.com/Halvani/TextUnitLib/issues"
