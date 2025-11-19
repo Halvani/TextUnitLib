@@ -32,14 +32,24 @@ tu = TextUnit()
 tu = TextUnit(model_id=TextUnit.SpacyModelSize.English_Large)
 ```
 
-### Extract function words
+### Extract character *n*-grams
 ```python
-text =  "The kickoff meeting will take place on Tuesday."
+text = "Man Bites Dog"
 
-print(tu.function_words(text))
+print(tu.char_ngrams(text, n=5))
 
-# ['The', 'will', 'on']
+# ['Man B', 'an Bi', 'n Bit', ' Bite', 'Bites', 'ites ', 'tes D', 'es Do', 's Dog']
 ```
+
+### Extract token *n*-grams
+```python
+text = "Man Bites Dog"
+
+print(tu.token_ngrams(text, n=2))
+
+# ['Man Bites', 'Bites Dog']
+```
+
 
 ### Extract contractions
 ```python
@@ -113,44 +123,87 @@ tu.named_entities(text_named_entities, restrict_to_categories=["ORG"])
 text_dates = """The first prototype was released on 2021-07-15, and version 1.0 followed on July 20, 2022. A major update arrived on 15/08/2023, just before the annual review on 08.09.2023. Our next release is scheduled for March 1st, 2024, with a beta planned for 01 March 2024. Please submit your reports by 12/31/2024 or, at the latest, by 2025/01/10. The kickoff meeting took place on Tuesday, 3 January 2023, and follow-ups are held every Monday."""
 
 # Preserve original format of the extracted dates (not bullet-proof)
-
 print(tu.dates(text_dates, preserve_input_format=True))
+
 # ['on 2021-07-15', 'on 1.0', 'wed on July 20, 2022', 'on 15/08/2023', 'on 08.09.2023', 'March 1st, 2024', '01 March 2024', 'by 12/31/2024', 'by 2025/01/10', 'on Tuesday, 3 January 2023', 'Monday']
 
 # Unify extracted dates to the format "dd.mm.yyyy" (default)
-
 print(tu.dates(text_dates))
+
 # ['15.07.2021', '01.11.2025', '20.07.2022', '15.08.2023', '09.08.2023', '01.03.2024', '01.03.2024', '31.12.2024', '10.01.2025', '03.01.2023', '17.11.2025']
 ```
+
 
 ### Extract stop words (superset of function words)
 ```python
 text =  "The kickoff meeting will take place on Tuesday."
 
 print(tu.stop_words(text))
+
 # ['The', 'will', 'take', 'on']
 ```
 
-### Extract Part of Speech tags (POS tags)
+### Extract function words
+```python
+text =  "The kickoff meeting will take place on Tuesday."
+
+print(tu.function_words(text))
+
+# ['The', 'will', 'on']
+```
+
+### Extract part of speech tags (POS tags)
 ```python
 text =  "The kickoff meeting will take place on Tuesday."
 
 # Extract all POS tags
-
 print(tu.postags(text))
+
 # ['DET', 'NOUN', 'NOUN', 'AUX', 'VERB', 'NOUN', 'ADP', 'PROPN', 'PUNCT']
 
 # Extract all POS tags and combine them with corresponding tokens
-
 print(tu.postags(text, combine_with_token=True, combine_sep=" "))
+
 # [('The', 'DET'), ('kickoff', 'NOUN'), ('meeting', 'NOUN'), ('will', 'AUX'), ('take', 'VERB'), ('place', 'NOUN'), ('on', 'ADP'), ('Tuesday', 'PROPN'), ('.', 'PUNCT')]
 
 # Extract only nouns and return their tokens instead of the POS tags
-
 print(tu.postags(text, tokens_only=True, tags_to_consider={"NOUN"}))
+
 # ['kickoff', 'meeting', 'place']
 ```
 
+### Extract lemmas
+```python
+text_lemmas = "The researchers were analyzing how various models predicted meanings that had already been inferred by earlier systems."
+
+print(tu.lemmas(text_lemmas))
+
+# ['the', 'researcher', 'be', 'analyze', 'how', 'various', 'model', 'predict', 'meaning', 'that', 'have', 'already', 'be', 'infer', 'by', 'early', 'system', '.']
+```
+
+### Extract quotes
+```python
+text_quotes = """Lena looked at her phone and muttered, “I cannot find the message anymore.” Her friend pointed at the screen and said, “Check the folder below.” Lena scrolled again and sighed, “Still nothing.” Her friend shrugged and replied, «Maybe it was deleted.»"""
+
+print(*tu.quotes(text_quotes, strip_marks=False), sep="\n")
+
+# “I cannot find the message anymore.”
+# “Check the folder below.”
+# “Still nothing.”
+# «Maybe it was deleted.»
+```
+
+### Extract URLs
+```python
+text_urls = """During the meeting Anna mentioned that the project documentation was now available at https://docs.example.org/start which helped everyone understand the initial setup. Mark added that the latest prototype could be viewed on the internal server at http://intranet.local/prototype. To gather more background information, Julia recommended checking https://www.research-info.net/articles/ai-overview Later Tom pointed out a helpful code repository at https://github.com/Halvani/TextUnitLib which included several utilities they could reuse. Before the session ended, Anna also shared a registration link for next week’s workshop: http://events.example.com/register?id=42"""
+
+print(*tu.urls(text_urls), sep="\n")
+
+# https://docs.example.org/start
+# https://www.research-info.net/articles/ai-overview
+# https://github.com/Halvani/TextUnitLib
+# http://events.example.com/register?id=42
+```
 
 <a name="Applications"></a>
 ## Applications

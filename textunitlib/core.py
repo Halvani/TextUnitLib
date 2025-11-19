@@ -1695,3 +1695,141 @@ class TextUnit:
         considered_function_words_lower = {fw.lower() for fw in considered_function_words}
 
         return [t for t in alpha_tokens if t.lower() in considered_function_words_lower]
+    
+    
+    def lemmas(self, text: str, lowercase: bool = False) -> List[str]:
+        """
+        Extract lemmatized tokens from the input text using the spaCy pipeline.
+
+        Args:
+            text (str): The input text to analyze.
+            lowercase (bool, optional): If True, return lemmas in lowercase form.
+                Defaults to False.
+
+        Returns:
+            List[str]: A list of lemmas corresponding to the spaCy tokenization.
+
+        Raises:
+            RuntimeError: If the spaCy pipeline is not initialized.
+        """
+        if self.__nlp is None:
+            raise RuntimeError("Internal spaCy pipeline is not initialized.")
+
+        spacy_tokens = self.tokens(text, strategy=self.Tokenization.SpacyTokens)
+        lemmas = [t.lemma_ for t in spacy_tokens]
+
+        return [lemma.lower() for lemma in lemmas] if lowercase else lemmas
+
+
+    def quotes(self,
+            text: str,
+            strip_marks: bool = True,
+            allow_multiline: bool = True,
+            min_length: int = 1,
+            extract_sentence_wise: bool = False) -> List[str]:
+        """
+        Extract quoted passages from text.
+
+        Supports various quotation styles including:
+            - Straight quotes: "..." and '...'
+            - Curly quotes: “...”, „...“, etc.
+            - Guillemets: «...», »...«, ‹...›, …
+
+        If extract_sentence_wise=True, quotations will be extracted separately for
+        each sentence detected by the spaCy pipeline. This helps avoid cross-sentence
+        over-matching and improves robustness for long or complex texts.
+
+        Args:
+            text (str): The input text.
+
+            strip_marks (bool, optional):
+                If True, return only the inner quoted text without quotation marks.
+                If False, return the entire quoted span including the marks.
+                Defaults to True.
+
+            allow_multiline (bool, optional):
+                If True, quotes may span multiple lines.
+                Defaults to True.
+
+            min_length (int, optional):
+                Minimum length of the inner quote (after stripping whitespace).
+                Defaults to 1.
+
+            extract_sentence_wise (bool, optional):
+                If True, run the quote extraction on each sentence separately.
+                If False, process the text as a whole.
+                Defaults to False.
+
+        Returns:
+            List[str]: Extracted quoted strings in order of appearance.
+        """
+
+        if not text:
+            return []
+
+        # Define pairs of opening and closing quotation marks
+        quote_pairs = [
+            ('"', '"'),
+            ("'", "'"),
+            ('“', '”'),
+            ('„', '“'),
+            ('«', '»'),
+            ('‹', '›'),
+            ('‚', '‘'),
+            ('‚', '’'),
+            ('»', '«'),
+        ]
+
+        flags = re.DOTALL if allow_multiline else 0
+        results: List[str] = []
+
+        def extract_from_segment(segment: str):
+            """Extract quotes from a single text segment (sentence or full text)."""
+            local: List[str] = []
+
+            for open_q, close_q in quote_pairs:
+
+                # Special handling for ASCII quotes to avoid apostrophe noise
+                if open_q in {"'", '"'} and open_q == close_q:
+                    pattern = (
+                        r'(?<!\w)' + re.escape(open_q) +
+                        r'(.*?)' +
+                        re.escape(close_q) + r'(?!\w)'
+                    )
+                else:
+                    pattern = re.escape(open_q) + r'(.*?)' + re.escape(close_q)
+
+                matches = re.finditer(pattern, segment, flags)
+                for match in matches:
+                    inner = match.group(1)
+
+                    # Skip short or whitespace-only inner texts
+                    if len(inner.strip()) < min_length:
+                        continue
+
+                    # Heuristic to skip apostrophe-contractions like 's, 't, 'm
+                    if open_q == close_q == "'" and len(inner) <= 2 and not any(ch.isspace() for ch in inner):
+                        continue
+
+                    full = match.group(0)
+                    extracted = inner if strip_marks else full
+
+                    if extracted not in local:
+                        local.append(extracted)
+            return local
+
+        # If sentence-wise extraction is requested, split into sentences
+        if extract_sentence_wise:
+            if self.__nlp is None:
+                raise RuntimeError("spaCy pipeline not initialized for sentence segmentation.")
+
+            sentences = self.sentences(text)
+
+            for sent in sentences:
+                for q in extract_from_segment(sent):
+                    results.append(q)
+
+        else:
+            # Extract from entire document
+            results.extend(extract_from_segment(text))
+        return results
